@@ -17,12 +17,25 @@ this library unifies both into a single three-state model: `active`, `disabled`,
 A `FeatureRegistry` holds `FeatureDescriptor` entries, each with an id and a
 default state. A configurable `FeatureStrategy` evaluates the actual state per
 feature, optionally based on an application context such as the current mode
-or the authenticated user. Strategies can abstain by returning `undefined`,
-in which case the descriptor default applies. Unknown feature ids resolve to
-`hidden`, so unregistered features never leak into the UI.
+or the authenticated user.
+
+The design principle is defaults plus deviations. Descriptors carry the
+normal state of a feature; strategies contain only the deviation rules and
+abstain from everything else by returning `undefined`, in which case the
+descriptor default applies. Do not write a strategy as a total function with
+a catch-all `active` branch: it duplicates the feature list, turns the
+descriptor defaults into dead code, and disables the fail-closed behavior.
+Unknown feature ids always resolve to `hidden`, so unregistered features
+never leak into the UI.
 
 Multiple strategies combine through `CompositeStrategy`, where the most
-restrictive verdict wins: `hidden` beats `disabled` beats `active`.
+restrictive non-abstaining verdict wins: `hidden` beats `disabled` beats
+`active`. Abstention is what makes this composition work, since each strategy
+only speaks up about the features it actually governs.
+
+Condition functions must be cheap and pure, since evaluation is lazy and
+runs on demand. The package READMEs document this in detail, including the
+React evaluation model, context memoization and bundle cost.
 
 ## Quick start
 
@@ -60,6 +73,9 @@ registry.setStrategy(
 registry.getState('git-sync', { mode: 'dexie' });
 registry.getReason('git-sync', { mode: 'dexie' });
 ```
+
+Note that `export` has no rule: the strategy abstains and the descriptor
+default applies. Only the deviations are rules.
 
 ## Development
 
