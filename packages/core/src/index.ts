@@ -1,0 +1,11 @@
+export { FEATURE_STATE_SEVERITY, mostRestrictive } from './feature-state';
+export type { FeatureState } from './feature-state';
+export type { FeatureDescriptor } from './feature-descriptor';
+export type { FeatureStrategy } from './feature-strategy';
+export { FeatureRegistry } from './feature-registry';
+export { CompositeStrategy } from './composite-strategy';
+export { StaticFeatureStrategy } from './static-feature-strategy';
+export { ConditionalFeatureStrategy } from './conditional-feature-strategy';
+export type { FeatureCondition } from './conditional-feature-strategy';
+export { RoleBasedFeatureStrategy } from './role-based-feature-strategy';
+export type { RoleRequirement, RoleExtractor } from './role-based-feature-strategy';
