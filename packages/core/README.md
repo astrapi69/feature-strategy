@@ -46,10 +46,41 @@ registry.getState('tts');
 registry.getReason('tts');
 ```
 
-The most restrictive verdict wins when strategies are combined:
-`hidden` beats `disabled` beats `active`. Strategies abstain by returning
-`undefined`, then the descriptor default applies. Unknown feature ids
-resolve to `hidden`.
+## The design principle: defaults plus deviations
+
+This is the part worth internalizing before writing your first strategy.
+Descriptors carry the normal state of a feature. Strategies contain ONLY
+the deviation rules and abstain from everything else by returning
+`undefined`. The registry resolves in this order:
+
+1. the strategy verdict, when it returns one
+2. the descriptor `defaultState`, when the strategy abstains
+3. `hidden` for unknown feature ids (fail closed)
+
+Do not write a strategy as a total function that returns a verdict for
+every feature. If most of your features are always active, they should
+appear only as descriptors with `defaultState: 'active'` and never in a
+strategy. A strategy with a catch-all `return 'active'` branch duplicates
+your feature list, turns the descriptor defaults into dead code, and
+silently disables the fail-closed behavior for unknown ids.
+
+When several strategies are combined through `CompositeStrategy`, the most
+restrictive non-abstaining verdict wins: `hidden` beats `disabled` beats
+`active`. Abstention is what makes this composition work, since each
+strategy only speaks up about the features it actually governs.
+
+## Conditions must be cheap and pure
+
+Evaluation is lazy and happens on demand: every `getState` call evaluates
+the strategy, and consumers such as the React adapter call it on render.
+`CompositeStrategy.getReason` additionally re-evaluates `getState` per
+inner strategy to find the winning verdict.
+
+For static maps this is a lookup and costs nothing. For
+`ConditionalFeatureStrategy`, write conditions as synchronous, pure
+lookups on the context object: no async work, no DOM access, no storage
+reads, no computation. Anything dynamic belongs in the context, which the
+application builds once and passes in, not in the condition.
 
 ## Strategies
 
