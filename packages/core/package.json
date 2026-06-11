@@ -1,6 +1,6 @@
 {
   "name": "@astrapi69/feature-strategy",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Framework-agnostic feature gating and component authorization strategies with three states: active, disabled, hidden",
   "keywords": [
     "feature-flags",
