@@ -41,33 +41,33 @@ React evaluation model, context memoization and bundle cost.
 
 ```ts
 import {
-  FeatureRegistry,
-  ConditionalFeatureStrategy
+    FeatureRegistry,
+    ConditionalFeatureStrategy
 } from '@astrapi69/feature-strategy';
 
 interface AppContext {
-  mode: 'api' | 'dexie';
+    mode: 'api' | 'dexie';
 }
 
 const registry = new FeatureRegistry<AppContext>();
 
 registry.registerAll([
-  { id: 'export', defaultState: 'active' },
-  { id: 'git-sync', defaultState: 'active' },
-  { id: 'backup-compare', defaultState: 'active' }
+    { id: 'export', defaultState: 'active' },
+    { id: 'git-sync', defaultState: 'active' },
+    { id: 'backup-compare', defaultState: 'active' }
 ]);
 
 registry.setStrategy(
-  new ConditionalFeatureStrategy<AppContext>({
-    'git-sync': {
-      evaluate: (context) => (context?.mode === 'dexie' ? 'hidden' : 'active'),
-      reason: 'Requires the git binary'
-    },
-    'backup-compare': {
-      evaluate: (context) => (context?.mode === 'dexie' ? 'hidden' : 'active'),
-      reason: 'Requires a backend'
-    }
-  })
+    new ConditionalFeatureStrategy<AppContext>({
+        'git-sync': {
+            evaluate: (context) => (context?.mode === 'dexie' ? 'hidden' : 'active'),
+            reason: 'Requires the git binary'
+        },
+        'backup-compare': {
+            evaluate: (context) => (context?.mode === 'dexie' ? 'hidden' : 'active'),
+            reason: 'Requires a backend'
+        }
+    })
 );
 
 registry.getState('git-sync', { mode: 'dexie' });
