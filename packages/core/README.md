@@ -13,32 +13,32 @@ npm install @astrapi69/feature-strategy
 
 ```ts
 import {
-  FeatureRegistry,
-  CompositeStrategy,
-  StaticFeatureStrategy,
-  RoleBasedFeatureStrategy
+    FeatureRegistry,
+    CompositeStrategy,
+    StaticFeatureStrategy,
+    RoleBasedFeatureStrategy
 } from '@astrapi69/feature-strategy';
 
 interface AppContext {
-  user?: { roles: readonly string[] };
+    user?: { roles: readonly string[] };
 }
 
 const registry = new FeatureRegistry<AppContext>();
 
 registry.registerAll([
-  { id: 'export', defaultState: 'active' },
-  { id: 'admin-panel', defaultState: 'hidden' },
-  { id: 'tts', defaultState: 'active' }
+    { id: 'export', defaultState: 'active' },
+    { id: 'admin-panel', defaultState: 'hidden' },
+    { id: 'tts', defaultState: 'active' }
 ]);
 
 registry.setStrategy(
-  new CompositeStrategy<AppContext>([
-    new StaticFeatureStrategy({ tts: 'hidden' }, { tts: 'Requires a TTS engine' }),
-    new RoleBasedFeatureStrategy<AppContext>(
-      { 'admin-panel': { roles: ['admin'], reason: 'Administrators only' } },
-      (context) => context?.user?.roles ?? []
-    )
-  ])
+    new CompositeStrategy<AppContext>([
+        new StaticFeatureStrategy({ tts: 'hidden' }, { tts: 'Requires a TTS engine' }),
+        new RoleBasedFeatureStrategy<AppContext>(
+            { 'admin-panel': { roles: ['admin'], reason: 'Administrators only' } },
+            (context) => context?.user?.roles ?? []
+        )
+    ])
 );
 
 registry.getState('admin-panel', { user: { roles: ['admin'] } });
@@ -67,7 +67,11 @@ silently disables the fail-closed behavior for unknown ids.
 When several strategies are combined through `CompositeStrategy`, the most
 restrictive non-abstaining verdict wins: `hidden` beats `disabled` beats
 `active`. Abstention is what makes this composition work, since each
-strategy only speaks up about the features it actually governs.
+strategy only speaks up about the features it actually governs. Note that
+per-feature outcomes configured inside a single strategy, such as the
+`missingState` of a role requirement, are that strategy's verdict only:
+composition can escalate the result to a more restrictive state when
+another strategy demands it, but it can never soften it.
 
 ## Conditions must be cheap and pure
 

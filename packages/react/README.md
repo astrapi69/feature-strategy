@@ -18,37 +18,37 @@ import { Feature, FeatureProvider, useFeature } from '@astrapi69/feature-strateg
 
 const registry = new FeatureRegistry<{ mode: string }>();
 registry.registerAll([
-  { id: 'export', defaultState: 'active' },
-  { id: 'git-sync', defaultState: 'active' }
+    { id: 'export', defaultState: 'active' },
+    { id: 'git-sync', defaultState: 'active' }
 ]);
 registry.setStrategy(
-  new ConditionalFeatureStrategy({
-    'git-sync': {
-      evaluate: (ctx) => (ctx?.mode === 'offline' ? 'hidden' : 'active'),
-      reason: 'Requires the git binary'
-    }
-  })
+    new ConditionalFeatureStrategy({
+        'git-sync': {
+            evaluate: (ctx) => (ctx?.mode === 'offline' ? 'hidden' : 'active'),
+            reason: 'Requires the git binary'
+        }
+    })
 );
 
 function App({ mode }: { mode: string }) {
-  const featureContext = useMemo(() => ({ mode }), [mode]);
-  return (
-    <FeatureProvider registry={registry} context={featureContext}>
-      <Toolbar />
-    </FeatureProvider>
-  );
+    const featureContext = useMemo(() => ({ mode }), [mode]);
+    return (
+        <FeatureProvider registry={registry} context={featureContext}>
+            <Toolbar />
+        </FeatureProvider>
+    );
 }
 
 function Toolbar() {
-  const exportFeature = useFeature('export');
-  return (
-    <div>
-      <button disabled={!exportFeature.isActive}>Export</button>
-      <Feature id="git-sync" whenDisabled={(reason) => <span>{reason}</span>}>
-        <button>Sync</button>
-      </Feature>
-    </div>
-  );
+    const exportFeature = useFeature('export');
+    return (
+        <div>
+            <button disabled={!exportFeature.isActive}>Export</button>
+            <Feature id="git-sync" whenDisabled={(reason) => <span>{reason}</span>}>
+                <button>Sync</button>
+            </Feature>
+        </div>
+    );
 }
 ```
 
