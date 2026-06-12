@@ -1,6 +1,6 @@
 {
   "name": "@astrapi69/feature-strategy-react",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "React adapter for @astrapi69/feature-strategy: provider, useFeature hook and Feature component",
   "keywords": [
     "feature-flags",
